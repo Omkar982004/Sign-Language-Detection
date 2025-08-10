@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import Webcam from "react-webcam";
 import * as tf from "@tensorflow/tfjs";
-import { Hands, HAND_CONNECTIONS } from "@mediapipe/hands";
+import * as mpHands from "@mediapipe/hands";
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
 import { Camera } from "@mediapipe/camera_utils";
 
@@ -42,7 +42,7 @@ const exampleImagePairs = [
   useEffect(() => {
     if (!webcamRef.current || !webcamRef.current.video) return;
 
-    const hands = new Hands({
+    const hands = new mpHands.Hands({
       locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
     });
 
@@ -64,7 +64,7 @@ const exampleImagePairs = [
 
       if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
         for (const landmarks of results.multiHandLandmarks) {
-          drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: "#61dafb", lineWidth: 3 });
+          drawConnectors(canvasCtx, landmarks, mpHands.HAND_CONNECTIONS, { color: "#61dafb", lineWidth: 3 });
           drawLandmarks(canvasCtx, landmarks, { color: "#21d07a", radius: 5 });
         }
 
@@ -108,17 +108,6 @@ const exampleImagePairs = [
     };
   }, [model, classNames]);
 
-  // Example images sources (replace with actual paths)
-  const exampleImages = [
-    "/examples/app1.png",
-    "/examples/app2.png",
-    "/examples/app3.png",
-    "/examples/app4.png",
-    "/examples/realhand1.jpg",
-    "/examples/realhand2.jpg",
-    "/examples/realhand3.jpg",
-    "/examples/realhand4.jpg",
-  ];
 
   return (
     <>
