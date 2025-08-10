@@ -1,7 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import Webcam from "react-webcam";
 import * as tf from "@tensorflow/tfjs";
-import * as mpHands from "@mediapipe/hands";
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
 import { Camera } from "@mediapipe/camera_utils";
 
@@ -42,7 +41,7 @@ const exampleImagePairs = [
   useEffect(() => {
     if (!webcamRef.current || !webcamRef.current.video) return;
 
-    const hands = new mpHands.Hands({
+    const hands = new window.Hands({
       locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
     });
 
@@ -64,7 +63,7 @@ const exampleImagePairs = [
 
       if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
         for (const landmarks of results.multiHandLandmarks) {
-          drawConnectors(canvasCtx, landmarks, mpHands.HAND_CONNECTIONS, { color: "#61dafb", lineWidth: 3 });
+          drawConnectors(canvasCtx, landmarks, window.HAND_CONNECTIONS, { color: "#61dafb", lineWidth: 3 });
           drawLandmarks(canvasCtx, landmarks, { color: "#21d07a", radius: 5 });
         }
 
@@ -92,7 +91,7 @@ const exampleImagePairs = [
       canvasCtx.restore();
     });
 
-    const camera = new Camera(webcamRef.current.video, {
+    const camera = new window.Camera(webcamRef.current.video, {
       onFrame: async () => {
         await hands.send({ image: webcamRef.current.video });
       },
