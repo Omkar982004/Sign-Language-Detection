@@ -2,16 +2,15 @@ import { useRef, useEffect, useState } from "react";
 import Webcam from "react-webcam";
 import * as tf from "@tensorflow/tfjs";
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
-import { Camera } from "@mediapipe/camera_utils";
 
 export default function SignCapture() {
   // Example images grouped as pairs (arrays of two)
-const exampleImagePairs = [
-  ["/images/ex1input.png", "/images/ex1output.png"],
-  ["/images/ex2input.png", "/images/ex2output.png"],
-  ["/images/ex3input.png", "/images/ex3output.png"],
-  ["/images/ex4input.png", "/images/ex4output.png"],
-];
+  const exampleImagePairs = [
+    ["/images/ex1input.png", "/images/ex1output.png"],
+    ["/images/ex2input.png", "/images/ex2output.png"],
+    ["/images/ex3input.png", "/images/ex3output.png"],
+    ["/images/ex4input.png", "/images/ex4output.png"],
+  ];
 
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
@@ -41,8 +40,14 @@ const exampleImagePairs = [
   useEffect(() => {
     if (!webcamRef.current || !webcamRef.current.video) return;
 
+    if (!window.Hands || !window.Camera || !window.drawConnectors) {
+      console.error("MediaPipe scripts not loaded yet");
+      return;
+    }
+
     const hands = new window.Hands({
-      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+      locateFile: (file) =>
+        `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
     });
 
     hands.setOptions({
@@ -57,19 +62,33 @@ const exampleImagePairs = [
       const canvasCtx = canvasRef.current.getContext("2d");
       canvasCtx.save();
 
-      canvasCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      canvasCtx.clearRect(
+        0,
+        0,
+        canvasRef.current.width,
+        canvasRef.current.height
+      );
       canvasCtx.fillStyle = "#1e1e2f"; // dark background
-      canvasCtx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      canvasCtx.fillRect(
+        0,
+        0,
+        canvasRef.current.width,
+        canvasRef.current.height
+      );
 
       if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
         for (const landmarks of results.multiHandLandmarks) {
-          drawConnectors(canvasCtx, landmarks, window.HAND_CONNECTIONS, { color: "#61dafb", lineWidth: 3 });
+          drawConnectors(canvasCtx, landmarks, window.HAND_CONNECTIONS, {
+            color: "#61dafb",
+            lineWidth: 3,
+          });
           drawLandmarks(canvasCtx, landmarks, { color: "#21d07a", radius: 5 });
         }
 
         if (model && classNames.length > 0) {
           tf.tidy(() => {
-            const imgTensor = tf.browser.fromPixels(canvasRef.current)
+            const imgTensor = tf.browser
+              .fromPixels(canvasRef.current)
               .resizeBilinear([64, 64])
               .toFloat()
               .expandDims(0);
@@ -78,7 +97,9 @@ const exampleImagePairs = [
             const scores = predictions.dataSync();
 
             const maxIdx = scores.indexOf(Math.max(...scores));
-            setPredictionResult(`${classNames[maxIdx]} — ${(scores[maxIdx] * 100).toFixed(1)}%`);
+            setPredictionResult(
+              `${classNames[maxIdx]} — ${(scores[maxIdx] * 100).toFixed(1)}%`
+            );
 
             imgTensor.dispose();
             predictions.dispose();
@@ -106,7 +127,6 @@ const exampleImagePairs = [
       hands.close();
     };
   }, [model, classNames]);
-
 
   return (
     <>
@@ -220,131 +240,153 @@ const exampleImagePairs = [
         </div>
       </div>
 
-    {/* Bottom section */}
-<div
-  style={{
-    width: "100%",
-    marginTop: "40px",
-    padding: "20px 40px",
-    backgroundColor: "#121227",
-    borderRadius: "20px",
-    marginLeft: "auto",
-    marginRight: "auto",
-    fontFamily: "'Poppins', sans-serif",
-    color: "#fff",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
-  }}
->
-  {/* Buttons container */}
-  <div style={{ textAlign: "center", margin: "24px", display: "flex", justifyContent: "center", gap: "20px" }}>
-    <a
-      href="https://github.com/your-repo-link"
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{
-        width : "20%",
-        backgroundColor: "#61dafb",
-        color: "#121227",
-        padding: "12px 28px",
-        fontWeight: "700",
-        borderRadius: "40px",
-        textDecoration: "none",
-        fontSize: "1.2rem",
-        boxShadow: "0 5px 15px rgba(97, 218, 251, 0.7)",
-        transition: "background-color 0.3s ease",
-        display: "inline-block",
-        cursor: "pointer",
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#52c0e8")}
-      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#61dafb")}
-    >
-      GitHub Repo
-    </a>
-
-    <a
-      href="https://your-learn-more-link.com"
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{
-        width : "20%",
-        backgroundColor: "#61dafb",
-        color: "#121227",
-        padding: "12px 28px",
-        fontWeight: "700",
-        borderRadius: "40px",
-        textDecoration: "none",
-        fontSize: "1.2rem",
-        boxShadow: "0 5px 15px rgba(97, 218, 251, 0.7)",
-        transition: "background-color 0.3s ease",
-        display: "inline-block",
-        cursor: "pointer",
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#52c0e8")}
-      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#61dafb")}
-    >
-      Learn More
-    </a>
-  </div>
-
-  {/* Instructions */}
-  <div
-    style={{
-      fontSize: "1.5rem",
-      lineHeight: 1.6,
-      marginBottom: "30px",
-      textAlign: "center",
-      fontStyle: "italic",
-      margin : "60px auto 40px auto",
-      opacity: 0.8,
-    }}
-  >
-    <p>A React.js web app powered by a CNN trained on 1200 images (300 per letter) for real-time sign language recognition, designed to assist hearing-impaired users—using MediaPipe and TensorFlow.js to interpret hand gestures via webcam input.</p>
-    <br />
-    <p>INSTRUCTIONS: Position your hand approximately 30cm from the camera, centered within the frame.</p>
-  </div>
-
-  {/* Examples images grouped as pairs */}
-  <div
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      gap: "20px",
-      alignItems: "center",
-    }}
-  >
-    {exampleImagePairs.map((pair, idx) => (
+      {/* Bottom section */}
       <div
-        key={idx}
         style={{
-          display: "flex",
-          gap: "20px",
+          width: "100%",
+          marginTop: "40px",
+          padding: "20px 40px",
+          backgroundColor: "#121227",
+          borderRadius: "20px",
+          marginLeft: "auto",
+          marginRight: "auto",
+          fontFamily: "'Poppins', sans-serif",
+          color: "#fff",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
         }}
       >
-        {pair.map((src, i) => (
-          <img
-            key={i}
-            src={src}
-            alt={`Example ${idx + 1} - Image ${i + 1}`}
+        {/* Buttons container */}
+        <div
+          style={{
+            textAlign: "center",
+            margin: "24px",
+            display: "flex",
+            justifyContent: "center",
+            gap: "20px",
+          }}
+        >
+          <a
+            href="https://github.com/your-repo-link"
+            target="_blank"
+            rel="noopener noreferrer"
             style={{
-              width: "350px",
-              height: "auto",
-              borderRadius: "15px",
-              boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
-              objectFit: "cover",
-              marginLeft: "20px",
-              marginRight: "20px",
-              marginBottom: "30px",
-              marginTop: "30px",
+              width: "20%",
+              backgroundColor: "#61dafb",
+              color: "#121227",
+              padding: "12px 28px",
+              fontWeight: "700",
+              borderRadius: "40px",
+              textDecoration: "none",
+              fontSize: "1.2rem",
+              boxShadow: "0 5px 15px rgba(97, 218, 251, 0.7)",
+              transition: "background-color 0.3s ease",
+              display: "inline-block",
+              cursor: "pointer",
             }}
-            loading="lazy"
-          />
-        ))}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "#52c0e8")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "#61dafb")
+            }
+          >
+            GitHub Repo
+          </a>
+
+          <a
+            href="https://your-learn-more-link.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              width: "20%",
+              backgroundColor: "#61dafb",
+              color: "#121227",
+              padding: "12px 28px",
+              fontWeight: "700",
+              borderRadius: "40px",
+              textDecoration: "none",
+              fontSize: "1.2rem",
+              boxShadow: "0 5px 15px rgba(97, 218, 251, 0.7)",
+              transition: "background-color 0.3s ease",
+              display: "inline-block",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "#52c0e8")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "#61dafb")
+            }
+          >
+            Learn More
+          </a>
+        </div>
+
+        {/* Instructions */}
+        <div
+          style={{
+            fontSize: "1.5rem",
+            lineHeight: 1.6,
+            marginBottom: "30px",
+            textAlign: "center",
+            fontStyle: "italic",
+            margin: "60px auto 40px auto",
+            opacity: 0.8,
+          }}
+        >
+          <p>
+            A React.js web app powered by a CNN trained on 1200 images (300 per
+            letter) for real-time sign language recognition, designed to assist
+            hearing-impaired users—using MediaPipe and TensorFlow.js to
+            interpret hand gestures via webcam input.
+          </p>
+          <br />
+          <p>
+            INSTRUCTIONS: Position your hand approximately 30cm from the camera,
+            centered within the frame.
+          </p>
+        </div>
+
+        {/* Examples images grouped as pairs */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "20px",
+            alignItems: "center",
+          }}
+        >
+          {exampleImagePairs.map((pair, idx) => (
+            <div
+              key={idx}
+              style={{
+                display: "flex",
+                gap: "20px",
+              }}
+            >
+              {pair.map((src, i) => (
+                <img
+                  key={i}
+                  src={src}
+                  alt={`Example ${idx + 1} - Image ${i + 1}`}
+                  style={{
+                    width: "350px",
+                    height: "auto",
+                    borderRadius: "15px",
+                    boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+                    objectFit: "cover",
+                    marginLeft: "20px",
+                    marginRight: "20px",
+                    marginBottom: "30px",
+                    marginTop: "30px",
+                  }}
+                  loading="lazy"
+                />
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
-    ))}
-  </div>
-</div>
-
-
     </>
   );
 }
