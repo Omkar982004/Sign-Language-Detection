@@ -1,7 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import Webcam from "react-webcam";
 import * as tf from "@tensorflow/tfjs";
-import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
 
 export default function SignCapture() {
   // Example images grouped as pairs (arrays of two)
@@ -78,11 +77,11 @@ export default function SignCapture() {
 
       if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
         for (const landmarks of results.multiHandLandmarks) {
-          drawConnectors(canvasCtx, landmarks, window.HAND_CONNECTIONS, {
+          window.drawConnectors(canvasCtx, landmarks, window.HAND_CONNECTIONS, {
             color: "#61dafb",
             lineWidth: 3,
           });
-          drawLandmarks(canvasCtx, landmarks, { color: "#21d07a", radius: 5 });
+          window.drawLandmarks(canvasCtx, landmarks, { color: "#21d07a", radius: 5 });
         }
 
         if (model && classNames.length > 0) {
