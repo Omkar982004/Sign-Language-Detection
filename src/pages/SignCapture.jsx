@@ -265,7 +265,7 @@ export default function SignCapture() {
           }}
         >
           <a
-            href="https://github.com/your-repo-link"
+            href="https://github.com/Omkar982004/Sign-Language-Detection"
             target="_blank"
             rel="noopener noreferrer"
             style={{
@@ -293,7 +293,7 @@ export default function SignCapture() {
           </a>
 
           <a
-            href="https://your-learn-more-link.com"
+            href="https://github.com/Omkar982004/Sign-Language-Detection"
             target="_blank"
             rel="noopener noreferrer"
             style={{
