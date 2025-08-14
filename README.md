@@ -15,6 +15,9 @@ The app uses **MediaPipe Hands** for hand landmark detection and a trained class
 
 ## Dataset And Model Training
 
+I personally captured and prepared the dataset for this project to ensure it was tailored for accurate gesture recognition.  
+It contains **1,200 labeled images** across **4 gesture classes (A, B, C, D)**.
+
 🔗 **[Dataset Link](https://drive.google.com/drive/folders/1MClawaGwBxG4RykE4BVjYMjA_ZLG1iNR?usp=sharing)**
 
 🔗 **[Model Training](https://colab.research.google.com/drive/1lCNcS-VkEG96zweZX6lk-3goHAodyeSW?usp=sharing)**
